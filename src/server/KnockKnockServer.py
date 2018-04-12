@@ -48,7 +48,9 @@ def main():
                 kkpDict[clientSock] = KnockKnockProtocol() #process a sent and returned msg
                 #print(clientSock)
                 #print( "Client (%serverSock, %serverSock) connected" % addr)
-                msg = kkpDict[clientSock].processInput('') + '\n'
+                #msg = kkpDict[clientSock].processInput('') + '\n'
+                msg = "Connected\n"
+                input()
                 clientSock.send(msg.encode('ascii'))
                  
                 #broadcast(server_socket, clientSock, "[%serverSock:%serverSock] entered our chatting room\n" % addr)

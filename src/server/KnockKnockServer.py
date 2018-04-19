@@ -34,6 +34,8 @@ def main():
     serverSock.bind((TCP_IP, portNumber))
     serverSock.listen(10)
     
+
+    
     # add server socket object to the list of readable connections
     SOCKET_LIST.append(serverSock)
     
@@ -50,6 +52,7 @@ def main():
                 #print( "Client (%serverSock, %serverSock) connected" % addr)
                 #msg = kkpDict[clientSock].processInput('') + '\n'
                 msg = "Connected\n"
+                print(clientSock.recv(BUFFER_SIZE).decode('ascii'))
                 input()
                 clientSock.send(msg.encode('ascii'))
                  

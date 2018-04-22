@@ -8,7 +8,7 @@ Created on Apr 19, 2018
 import socket
 import sys
 import select
-from chatProtocol import chatProtocol
+
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     
     # add server socket object to the list of readable connections
     SOCKET_LIST.append(serverSock)
-    
+   
     print ("Chat server started on port " + str(portNumber))
     
     while 1: 
@@ -47,16 +47,19 @@ def main():
                 input()
                 clientSock.send(msg.encode('ascii'))
                 
+                broadcast(serverSock, clientSock, "[%serverSock:%serverSock] entered our chatting room\n" % addr)
+                
             else:
                 try: 
                     data = sock.recv(BUFFER_SIZE)
                     
                     if data:
-                        print(sock.getHostName())
+                        
+                        print(str(sock))
                         clientmsg = data.decode('ascii')
                         clientmsg = clientmsg.strip('\r\n')
                         #print("Client sent:", clientmsg)
-                        msg = kkpDict[sock].processInput(clientmsg) + "\n"
+                        
                         #print('sending:',msg)
                         sock.send(msg.encode('ascii'))
                     else:
@@ -69,13 +72,17 @@ def main():
                     continue
     serverSock.close()
                 
-                
-                
-                
-                
-                
-                
-                
+    def broadcast(serverSock, sock, msg):
+        for socket in SOCKET_LIST:
+            if socket != serverSock and socket != sock:
+                try:
+                    socket.send(msg)
+                except:
+                    socket.close()
+                    if socket in SOCKET_LIST:
+                        SOCKET_LIST.remove(socket)
+                        
+    conn.send(msg.encode('ascii'))    
                 
                 
                 

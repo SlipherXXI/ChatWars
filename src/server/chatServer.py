@@ -9,19 +9,20 @@ import socket
 import sys
 import select
 
-
+SOCKET_LIST = []
+BUFFER_SIZE = 20
 
 def main():
     
     TCP_IP = '127.0.0.1'
     #TCP_PORT = 5005
-    BUFFER_SIZE = 20
+    
     if len(sys.argv)  != 2:
         print('Usage: python ChatWarsServer.py <port number>')
         sys.exit(1)
     
-    SOCKET_LIST = []  
-    cwpDict = {}
+      
+    
     
     portNumber = int(sys.argv[1])
     
@@ -44,13 +45,14 @@ def main():
                 clientSock, addr = serverSock.accept()
                 SOCKET_LIST.append(clientSock)
                 print( "Client (%s, %s) connected" % addr)
+                
+                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chatting room\n" % addr)
                 msg = "Connected\n"
                 print(clientSock.recv(BUFFER_SIZE).decode('ascii'))
                 
                 clientSock.send(msg.encode('ascii'))
                 
-                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chatting room\n" % addr)
-                print("%serverSock:%serverSock entered our chatting room\n" % addr)
+               
                 
             else:
                 try: 
@@ -63,8 +65,8 @@ def main():
                         print(str(sock))
                         clientmsg = data.decode('ascii')
                         clientmsg = clientmsg.strip('\r\n')
-                        #print("Client sent:", clientmsg)
-                        #print('sending:',msg)
+                        print("Client sent:", clientmsg)
+                        print('sending:',msg)
                         sock.send(msg.encode('ascii'))
                         
                     else:
@@ -84,7 +86,7 @@ def main():
     
 # broadcast chat messages to all connected clients
 def broadcast(serverSock, sock, msg):
-    SOCKET_LIST = []
+    
     # send the message only to peer
     for socket in SOCKET_LIST:
         if socket != serverSock and socket != sock:
@@ -99,7 +101,7 @@ def broadcast(serverSock, sock, msg):
                     
 if __name__=="__main__":
     
-        sys.exit(main())                                  
-                             
+    sys.exit(main())                                  
+                           
                 
                 

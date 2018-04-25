@@ -43,11 +43,11 @@ def main():
                 SOCKET_LIST.append(clientSock)
                 print( "Client (%s, %s) connected" % addr)
                 clientSock.send(chat_encode("Welcome to Chat Wars"))
-                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chatting room" % addr)
-                msg = "Connected\n"
+                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chat room" % addr)
+                '''msg = "Connected"
                 print(clientSock.recv(BUFFER_SIZE).decode('ascii'))
                 
-                clientSock.send(msg.encode('ascii'))
+                clientSock.send(msg.encode('ascii'))'''
                 
                
                 
@@ -96,7 +96,7 @@ def broadcast(serverSock, sock, msg):
                     SOCKET_LIST.remove(socket)
                     
 def chat_encode(msg):
-    temp = msg + '/n'
+    temp = msg + '\n'
     return temp.encode('ascii')
 
 def chat_decode(msg):

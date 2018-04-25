@@ -43,66 +43,63 @@ def main():
             if sock == serverSock: 
                 clientSock, addr = serverSock.accept()
                 SOCKET_LIST.append(clientSock)
-                
+                print( "Client (%s, %s) connected" % addr)
                 msg = "Connected\n"
                 print(clientSock.recv(BUFFER_SIZE).decode('ascii'))
                 
                 clientSock.send(msg.encode('ascii'))
                 
-                broadcast(serverSock, clientSock, "[%serverSock:%serverSock] entered our chatting room\n" % addr)
+                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chatting room\n" % addr)
+                print("%serverSock:%serverSock entered our chatting room\n" % addr)
                 
             else:
                 try: 
+                    # receiving data from the socket.
                     data = sock.recv(BUFFER_SIZE)
                     
                     if data:
-                        
+                        #something is in the socket
+                        broadcast(serverSock, sock, "\r" + '[' + str(sock.getpeername()) + '] ' + data)
                         print(str(sock))
                         clientmsg = data.decode('ascii')
                         clientmsg = clientmsg.strip('\r\n')
                         #print("Client sent:", clientmsg)
-                        
                         #print('sending:',msg)
                         sock.send(msg.encode('ascii'))
+                        
                     else:
+                        # remove the socket that's broken
                         if sock in SOCKET_LIST:
                             print('client exit')
-                            SOCKET_LIST.remove(sock)    
+                            SOCKET_LIST.remove(sock)
+                                
+                        # at this stage, no data means probably the connection has been broken
+                        broadcast(serverSock, sock, "Client (%s, %s) is offline\n" % addr)
                         
                 except:
-                    
+                    broadcast(serverSock, sock, "Client (%s, %s) is offline\n" % addr)
                     continue
                 
     serverSock.close()
     
-    #conn.send(msg.encode('ascii'))    
-                
-    if __name__=="__main__":
-        sys.exit(main())
-        
-main()       
- 
+# broadcast chat messages to all connected clients
 def broadcast(serverSock, sock, msg):
     SOCKET_LIST = []
+    # send the message only to peer
     for socket in SOCKET_LIST:
         if socket != serverSock and socket != sock:
             try:
                 socket.send(msg)
             except:
+                # broken socket connection
                 socket.close()
+                # broken socket, remove it
                 if socket in SOCKET_LIST:
                     SOCKET_LIST.remove(socket)
-                        
+                    
+if __name__=="__main__":
     
-            
-                
-    
-                
-                
-                
-                
-                
-                
-                
+        sys.exit(main())                                  
+                             
                 
                 

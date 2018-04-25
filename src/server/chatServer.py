@@ -9,13 +9,15 @@ import socket
 import sys
 import select
 
+
+TCP_IP = '127.0.0.1'
+    #TCP_PORT = 5005
 SOCKET_LIST = []
 BUFFER_SIZE = 20
 
 def main():
     
-    TCP_IP = '127.0.0.1'
-    #TCP_PORT = 5005
+    
     
     if len(sys.argv)  != 2:
         print('Usage: python ChatWarsServer.py <port number>')

@@ -10,10 +10,22 @@ import sys
 import select
 
 
+class User():
+    def __init__(self, name, password, ip, port):
+        self.name = name
+        self.password = password
+        self.ip = ip
+        self.port = port
+        
+
+
+
 TCP_IP = '127.0.0.1'
     #TCP_PORT = 5005
 SOCKET_LIST = []
 BUFFER_SIZE = 20
+socketToUser={}
+
 
 def main():
     
@@ -32,8 +44,6 @@ def main():
     # add server socket object to the list of readable connections
     SOCKET_LIST.append(serverSock)
    
-    print ("Chat server started on port " + str(portNumber))
-    
     while 1: 
         ready_to_read,ready_to_write,in_error = select.select(SOCKET_LIST,[],[],0)
         
@@ -43,13 +53,15 @@ def main():
                 SOCKET_LIST.append(clientSock)
                 print( "Client (%s, %s) connected" % addr)
                 clientSock.send(chat_encode("Welcome to Chat Wars"))
-                broadcast(serverSock, clientSock, "%serverSock:%serverSock entered our chat room" % addr)
-                '''msg = "Connected"
-                print(clientSock.recv(BUFFER_SIZE).decode('ascii'))
+                clientSock.send(chat_encode("please enter user name"))
+                clientSock.send(chat_encode("Enter password"))
                 
-                clientSock.send(msg.encode('ascii'))'''
+                data = clientSock.recv(BUFFER_SIZE)
+                clientmsg= chat_decode(data)
                 
-               
+                ip, port = clientSock.getpeername()
+                socketToUser[clientSock] = User(clientmsg , ip , port)
+                broadcast(serverSock, clientSock, "entered our chat room")
                 
             else:
                 try: 
@@ -58,12 +70,10 @@ def main():
                     
                     if data:
                         #something is in the socket
-                        broadcast(serverSock, sock, "\r" + '[' + str(sock.getpeername()) + '] ' + data)
-                        print(str(sock))
                         clientmsg = chat_decode(data)
+                        broadcast(serverSock, sock, clientmsg)
+                        print(str(sock))
                         print("Client sent:", clientmsg)
-                        print('sending:',msg)
-                        sock.send(msg.encode('ascii'))
                         
                     else:
                         # remove the socket that's broken
@@ -72,10 +82,11 @@ def main():
                             SOCKET_LIST.remove(sock)
                                 
                         # at this stage, no data means probably the connection has been broken
-                        broadcast(serverSock, sock, "Client (%s, %s) is offline" % addr)
+                        broadcast(serverSock, sock, " is offline" )
                         
-                except:
-                    broadcast(serverSock, sock, "Client (%s, %s) is offline" % addr)
+                except Exception as inst:
+                    print(inst)
+                    #broadcast(serverSock, sock, "Client (%s, %s) is offline" % addr)
                     continue
                 
     serverSock.close()
@@ -87,7 +98,8 @@ def broadcast(serverSock, sock, msg):
     for socket in SOCKET_LIST:
         if socket != serverSock and socket != sock:
             try:
-                socket.send(chat_encode(msg))
+                user = socketToUser[sock]
+                socket.send(chat_encode('[' + user.name + ']' + msg))
             except:
                 # broken socket connection
                 socket.close()

@@ -23,7 +23,7 @@ TCP_IP = '127.0.0.1'
 SOCKET_LIST = []
 BUFFER_SIZE = 20
 socketToUser={}
-password = "mypassword"
+#password = "mypassword"
 
 def main():
     

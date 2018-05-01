@@ -1,6 +1,5 @@
 '''
 Created on Apr 19, 2018
-
 @author: rslip
 '''
 
@@ -11,9 +10,8 @@ import select
 
 
 class User():
-    def __init__(self, name, password, ip, port):
+    def __init__(self, name, ip, port):
         self.name = name
-        self.password = password
         self.ip = ip
         self.port = port
         
@@ -25,7 +23,7 @@ TCP_IP = '127.0.0.1'
 SOCKET_LIST = []
 BUFFER_SIZE = 20
 socketToUser={}
-
+password = "mypassword"
 
 def main():
     

@@ -23,7 +23,7 @@ TCP_IP = '127.0.0.1'
 SOCKET_LIST = []
 BUFFER_SIZE = 20
 socketToUser={}
-#password = "mypassword"
+password = "password"
 
 def main():
     
@@ -48,18 +48,21 @@ def main():
         for sock in ready_to_read:
             if sock == serverSock: 
                 clientSock, addr = serverSock.accept()
+                
                 SOCKET_LIST.append(clientSock)
                 print( "Client (%s, %s) connected" % addr)
                 clientSock.send(chat_encode("Welcome to Chat Wars"))
                 clientSock.send(chat_encode("please enter user name"))
                 clientSock.send(chat_encode("Enter password"))
+                if password != "password":
+                    clientSock.close();
+                else:
+                    data = clientSock.recv(BUFFER_SIZE)
+                    clientmsg= chat_decode(data)
                 
-                data = clientSock.recv(BUFFER_SIZE)
-                clientmsg= chat_decode(data)
-                
-                ip, port = clientSock.getpeername()
-                socketToUser[clientSock] = User(clientmsg , ip , port)
-                broadcast(serverSock, clientSock, "entered our chat room")
+                    ip, port = clientSock.getpeername()
+                    socketToUser[clientSock] = User(clientmsg , ip , port)
+                    broadcast(serverSock, clientSock, "entered our chat room")
                 
             else:
                 try: 
@@ -72,6 +75,10 @@ def main():
                         broadcast(serverSock, sock, clientmsg)
                         print(str(sock))
                         print("Client sent:", clientmsg)
+                        f = open("chatWars.txt", "r")
+                        if f.mode == 'r':
+                            contents =f.read()
+                            print(clientmsg)
                         
                     else:
                         # remove the socket that's broken
